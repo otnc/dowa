@@ -6,6 +6,8 @@
 [![Node](https://img.shields.io/node/v/dowa)](https://www.npmjs.com/package/dowa)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
+> dowa means どわーw (冷笑)
+
 冷笑を検知しますw
 
 ## 動作環境
