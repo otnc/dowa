@@ -14,6 +14,7 @@ export interface PatternDefinition {
 // 文字クラスでは表現できない)。
 const A = "[あぁアァｱｧ]";
 const CHI = "[ちチﾁ]";
+const DE = "(?:で|デ|ﾃﾞ)";
 const DO = "(?:ど|ド|ﾄﾞ)";
 const E = "[えぇエェｴｪ]";
 const GO = "(?:ご|ゴ|ｺﾞ)";
@@ -52,7 +53,7 @@ const stem = (...parts: string[]) => parts.join("") + STEM_SUFFIX;
 // 語尾(w/笑など)を要求しない語幹単体(伸ばし棒の繰り返しのみ許容)
 const bare = (...parts: string[]) => parts.join("") + "[-ｰー～っッｯ]*";
 // 「(です)やん」で終わる冷笑フレーズ共通のビルダー
-const yan = (word = "") => `${word}(?:です)?やん${STEM_SUFFIX}`;
+const yan = (word = "") => `${word}(?:${DE}${SU})?${YA}${N}${STEM_SUFFIX}`;
 
 export const patterns: PatternDefinition[] = [
   // --- 絵文字 (strict) ---
@@ -72,19 +73,19 @@ export const patterns: PatternDefinition[] = [
     id: "emoji-double-exclamation",
     strict: true,
     source: "\\u{203C}\\u{FE0F}?", // ‼️
-    samples: ["は？そんなことある‼️"],
+    samples: ["そんな‼️"],
   },
   {
     id: "emoji-bang",
     strict: true,
     source: "\\u{2757}\\u{FE0F}?", // ❗
-    samples: ["それはさすがに無理があるだろ❗"],
+    samples: ["いいね❗"],
   },
   {
     id: "emoji-question",
     strict: true,
     source: "\\u{2753}\\u{FE0F}?", // ❓
-    samples: ["は❓意味わからんのだが"],
+    samples: ["は❓"],
   },
   {
     id: "emoji-interrobang",
@@ -96,19 +97,19 @@ export const patterns: PatternDefinition[] = [
     id: "emoji-eye-roll",
     strict: true,
     source: "\\u{1F644}", // 🙄
-    samples: ["はいはい、また同じ話🙄"],
+    samples: ["はいはい🙄"],
   },
   {
     id: "emoji-smirk",
     strict: true,
     source: "\\u{1F60F}", // 😏
-    samples: ["それな、知ってた😏"],
+    samples: ["それな😏"],
   },
   {
     id: "emoji-clown",
     strict: true,
     source: "\\u{1F921}", // 🤡
-    samples: ["自分だけ気づいてない🤡"],
+    samples: ["ふっ🤡"],
   },
 
   // --- 絵文字 (relaxedのみ: 単体だと冷笑と断定しづらいもの) ---
@@ -148,7 +149,7 @@ export const patterns: PatternDefinition[] = [
     id: "stem-kichi",
     strict: true,
     source: stem(KI, CHI),
-    samples: ["きちーｗ急に早口になってて草"],
+    samples: ["きちーｗ"],
   },
   {
     id: "stem-ou",
@@ -160,43 +161,43 @@ export const patterns: PatternDefinition[] = [
     id: "stem-uo",
     strict: true,
     source: stem(U, O),
-    samples: ["うおw急にキレ出してて草"],
+    samples: ["うおw"],
   },
   {
     id: "stem-dowa",
     strict: true,
     source: stem(DO, WA),
-    samples: ["どわーwww必死すぎん"],
+    samples: ["どわーwww"],
   },
   {
     id: "stem-uwa",
     strict: true,
     source: stem(U, WA),
-    samples: ["うわw自分で気づいてないんかな"],
+    samples: ["うわーw"],
   },
   {
     id: "stem-samu",
     strict: true,
     source: stem(SA, MU),
-    samples: ["そのノリさむw誰も乗ってないよ"],
+    samples: ["そのノリさむw"],
   },
   {
     id: "stem-ita",
     strict: true,
-    source: stem(I, TA),
-    samples: ["それいたw自覚ないの草"],
+    source: stem(`${A}?`, I, `${TA}+`),
+    samples: ["アイタタタタw"],
   },
   {
     id: "stem-kimo",
     strict: true,
     source: stem(KI, MO),
-    samples: ["その言い方きもwドン引きだわ"],
+    samples: ["きもwドン引きだわ"],
   },
   {
     id: "stem-kita",
     strict: true,
     source: stem(KI, TA),
-    samples: ["きたーw予想通りの反応で草"],
+    samples: ["キター！！！！ｗ"],
   },
 
   // --- 語幹 + w/笑/爆笑/(笑) (relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
@@ -204,7 +205,7 @@ export const patterns: PatternDefinition[] = [
     id: "stem-iya",
     strict: false,
     source: stem(I, YA),
-    samples: ["いやwそれは草すぎるでしょ"],
+    samples: ["いやwそれは草"],
   },
 
   // --- 語幹単体 (relaxedのみ: 語尾のw/笑がなくても検知する) ---
@@ -290,12 +291,12 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-yan",
     strict: true,
     source: yan(),
-    samples: ["それめっちゃ必死ですやんw", "冗談やんwノリ悪いなあ"],
+    samples: ["めっちゃ必死やんw", "冗談やんwノリ悪いなあ", "冗談ですやんw"],
   },
   {
     id: "phrase-sonna-nori",
     strict: true,
-    source: stem(SO, U, I, U, NO, RI, "[…\\.･]*"),
+    source: stem(SO, U, I, U, NO, RI, "[…\\.・･]*"),
     samples: ["あぁ、そういうノリ...w理解した"],
   },
 
@@ -316,7 +317,7 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-omoroi",
     strict: false,
     source: stem(O, MO, RO, I, NA, `${A}?`),
-    samples: ["おもろいなあwそのノリ嫌いじゃない"],
+    samples: ["おもろいなあwキミw"],
   },
   {
     id: "phrase-sugoi",
