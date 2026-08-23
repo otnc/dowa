@@ -56,7 +56,6 @@
   "homepage": "https://github.com/otnc/dowa#readme",
   "devDependencies": {
     "@eslint/js": "^10.0.1",
-    "@types/node": "^25.3.2",
     "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^10.9.0",
     "eslint-config-prettier": "^10.1.8",
