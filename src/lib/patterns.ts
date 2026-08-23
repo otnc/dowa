@@ -155,6 +155,12 @@ export const patterns: PatternDefinition[] = [
   // --- フレーズ系(strict) ---
   // 元ネタ: https://note.com/kido_meigen/n/nc0fb2d47f6f6 / https://w.atwiki.jp/reisyou/pages/10.html
   {
+    id: "phrase-kakke",
+    strict: true,
+    source: `かっけ${STEM_SUFFIX}`,
+    samples: ["かっけーw"],
+  },
+  {
     id: "phrase-kakkoyo",
     strict: true,
     source: `かっこよ${STEM_SUFFIX}`,
