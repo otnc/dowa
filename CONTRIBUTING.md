@@ -16,11 +16,11 @@ PRに適切なラベルを付与してください
 
 ## 説明
 
-- 冷笑のパターン(regex)を追加する場合
-  - [./src/lib/regex.ts](./src/lib/regex.ts) にパターンを追加してください
-  - [テストケース](./test/regex.test.ts) に該当の冷笑を追加してください
+- 冷笑のパターンを追加する場合
+  - [./src/lib/patterns.ts](./src/lib/patterns.ts) の `patterns` 配列に `PatternDefinition` を1つ追加してください(`id` / `label` / `strict` / `source` / `samples`)
+    - `samples` に書いたサンプル文字列は自動でテスト化されます([test/patterns.test.ts](./test/patterns.test.ts))。個別にテストコードを書く必要はありません
   - 可能であれば **ひらがな** , **カタカナ** , **半角カナ** , **小文字** も同様に含めてください
-  - 追加するパターンが明らかに冷笑な場合は `regexStrict` のほうに、冷笑か怪しい場合や文脈によっては冷笑ではないパターンは `relaxedOnly` に追加してください
+  - 追加するパターンが明らかに冷笑な場合は `strict: true` に、冷笑か怪しい場合や文脈によっては冷笑ではないパターンは `strict: false` (relaxedモードでのみ検知)にしてください
 
 - 機能の追加をする場合
   - PRの説明欄に機能についての説明を記載してください
