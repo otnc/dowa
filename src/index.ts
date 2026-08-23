@@ -1,20 +1,23 @@
 import { regexStrict, regexRelaxed } from "./lib/regex";
+import { patterns, type PatternDefinition } from "./lib/patterns";
 
 export interface DowaOptions {
   /** 検知範囲を拡大するか (デフォルト: false) */
   relaxed?: boolean;
 }
 
-/**
- * テキスト中の冷笑パターンをすべて検出する。
- * @param text 検査対象の文字列
- * @param options.relaxed true で検知範囲を拡大する (デフォルト: false)
- * @returns マッチした文字列の配列。見つからなければ null
- */
-export function findAll(
-  text: string,
-  options: DowaOptions = {}
-): string[] | null {
+export interface DowaMatch {
+  /** マッチした文字列 */
+  text: string;
+  /** マッチ開始位置(UTF-16コードユニット単位、String#matchAllのindexと同じ) */
+  index: number;
+  /** マッチしたパターンのid ([lib/patterns.ts](./lib/patterns.ts) 参照) */
+  patternId: string;
+  /** そのパターンがstrictかどうか */
+  strict: boolean;
+}
+
+function validate(text: string, options: DowaOptions): boolean {
   if (typeof text !== "string") {
     throw new TypeError('"text" must be a string.');
   }
@@ -25,6 +28,19 @@ export function findAll(
   if (typeof relaxed !== "boolean") {
     throw new TypeError('"options.relaxed" must be a boolean.');
   }
+  return relaxed;
+}
+
+/**
+ * テキスト中の冷笑パターンをすべて検出する。
+ * @param text 検査対象の文字列
+ * @param options.relaxed true で検知範囲を拡大する (デフォルト: false)
+ */
+export function findAll(
+  text: string,
+  options: DowaOptions = {}
+): string[] | null {
+  const relaxed = validate(text, options);
   const re = relaxed ? regexRelaxed : regexStrict;
   re.lastIndex = 0;
   const m = text.match(re);
@@ -40,4 +56,34 @@ export function contains(text: string, options: DowaOptions = {}): boolean {
   return !!findAll(text, options);
 }
 
-export { regexStrict, regexRelaxed };
+/**
+ * テキスト中の冷笑パターンを、どのパターンにマッチしたかの詳細付きで検出する。
+ * パターンごとに独立して検索するため、複数パターンの一致範囲が重なる場合は
+ * それぞれ個別の結果として返る(findAllの重複排除された結果とは一致しない)。
+ * @param text 検査対象の文字列
+ * @param options.relaxed true で検知範囲を拡大する (デフォルト: false)
+ */
+export function findMatches(
+  text: string,
+  options: DowaOptions = {}
+): DowaMatch[] | null {
+  const relaxed = validate(text, options);
+  const results: DowaMatch[] = [];
+  for (const pattern of patterns) {
+    if (!pattern.strict && !relaxed) continue;
+    const re = new RegExp(pattern.source, "gu");
+    for (const m of text.matchAll(re)) {
+      results.push({
+        text: m[0],
+        index: m.index,
+        patternId: pattern.id,
+        strict: pattern.strict,
+      });
+    }
+  }
+  results.sort((a, b) => a.index - b.index);
+  return results.length ? results : null;
+}
+
+export { regexStrict, regexRelaxed, patterns };
+export type { PatternDefinition };
