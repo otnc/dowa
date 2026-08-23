@@ -65,7 +65,7 @@ describe("冷笑検出", () => {
     if (typeof c.expected === "boolean") {
       test(`case ${i} [${isRelaxed ? "relaxed" : "strict"}] contains -> ${c.content}`, () => {
         expect(contains(c.content, { relaxed: isRelaxed })).toBe(
-          c.expected as boolean,
+          c.expected as boolean
         );
       });
     } else {

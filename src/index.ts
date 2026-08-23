@@ -13,7 +13,7 @@ export interface DowaOptions {
  */
 export function findAll(
   text: string,
-  options: DowaOptions = {},
+  options: DowaOptions = {}
 ): string[] | null {
   if (typeof text !== "string") {
     throw new TypeError('"text" must be a string.');
