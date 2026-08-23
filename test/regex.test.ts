@@ -47,7 +47,6 @@ const cases: Case[] = [
   { content: "どわー爆笑爆笑", expected: true },
   { content: "お、おうｗ", expected: true },
   { content: "きちーｗ", expected: true },
-  // (笑) は語幹込みで一致する(旧実装では語幹が欠落するバグがあった)
   { content: "うお(笑)", expected: ["うお(笑)"] },
   { content: "どわー（笑）", expected: ["どわー（笑）"] },
   // 複数マッチ
