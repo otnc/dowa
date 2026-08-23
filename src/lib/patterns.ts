@@ -44,7 +44,7 @@ export const patterns: PatternDefinition[] = [
     id: "emoji-double-exclamation",
     strict: true,
     source: "\\u{203C}\\u{FE0F}?",
-    samples: ["本当‼️?"],
+    samples: ["本当‼️"],
   },
   { id: "emoji-bang", strict: true, source: "\\u{2757}", samples: ["早く❗"] },
   {
