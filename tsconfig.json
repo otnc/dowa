@@ -9,9 +9,7 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "outDir": "dist",
-    "declaration": true,
-    "emitDeclarationOnly": true
+    "noEmit": true
   },
-  "include": ["src"]
+  "include": ["src", "test", "tsdown.config.ts", "vitest.config.ts"]
 }

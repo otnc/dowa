@@ -1,10 +1,17 @@
 # dowa
 
 [![npm version](https://badge.fury.io/js/dowa.svg)](https://badge.fury.io/js/dowa)
+[![CI](https://github.com/otnc/dowa/actions/workflows/ci.yml/badge.svg)](https://github.com/otnc/dowa/actions/workflows/ci.yml)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![Node](https://img.shields.io/node/v/dowa)](https://www.npmjs.com/package/dowa)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
 冷笑を検知しますw
+
+## 動作環境
+
+- Node.js >= 14 (ESM/CJS 両対応)
+- ブラウザ(バンドラー経由での利用)
 
 ## インストール
 

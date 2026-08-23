@@ -9,9 +9,10 @@ PRに適切なラベルを付与してください
 1. このリポジトリをforkしてからローカルにクローンします
 2. `npm install` を実行
 3. 必要な修正や追加を行う
-4. `npm run format` でコードを整形する (prettier)
-5. `npm run build` でビルドエラーが出ないことを確認する
-6. `npm test` で失敗しないかを確認する (必要であればテストケースを追加してから行う)
+4. `npm run check` でコードを整形&lintする (prettier + eslint)
+5. `npm run typecheck` で型チェックが通ることを確認する
+6. `npm run build` でビルドエラーが出ないことを確認する
+7. `npm test` で失敗しないかを確認する (必要であればテストケースを追加してから行う)
 
 ## 説明
 
@@ -32,5 +33,5 @@ PRに適切なラベルを付与してください
 
 - 依存関係を追加・更新すること
   - ブラウザでも動作することを前提
-- .github/ , scripts/ を変更すること
+- .github/ を変更すること
 - package-lock.json , package.json を変更すること・バージョンを変更すること
