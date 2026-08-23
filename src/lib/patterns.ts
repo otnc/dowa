@@ -27,7 +27,9 @@ const KU = "[くクｸ]";
 const MO = "[もモﾓ]";
 const MU = "[むムﾑ]";
 const NA = "[なナﾅ]";
+const NO = "[のノﾉ]";
 const O = "[おぉオォｵｫ]";
+const RI = "[りリﾘ]";
 const RO = "[ろロﾛ]";
 const SA = "[さサｻ]";
 const SHI = "[しシｼ]";
@@ -38,15 +40,18 @@ const SU = "[すスｽ]";
 const TA = "[たタﾀ]";
 const U = "[うぅウゥｳｩ]";
 const WA = "[わゎワヮﾜ]";
+const YA = "[やヤﾔ]";
 const YO = "[よヨﾖ]";
 
 // 語幹の後に続く「伸ばし棒/促音の繰り返し」+「！/？」+「w/笑/爆笑/(笑)」
 const STEM_SUFFIX =
-  "[-ｰー～っッｯ]*[！!？?]*(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
+  "[-ｰー～っッｯ]*[！!？?❗❓]*(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
 // モーラ断片を連結して語幹+STEM_SUFFIXの正規表現ソースを作る
 const stem = (...parts: string[]) => parts.join("") + STEM_SUFFIX;
 // 語尾(w/笑など)を要求しない語幹単体(伸ばし棒の繰り返しのみ許容)
 const bare = (...parts: string[]) => parts.join("") + "[-ｰー～っッｯ]*";
+// 「(です)やん」で終わる冷笑フレーズ共通のビルダー
+const yan = (word = "") => `${word}(?:です)?やん${STEM_SUFFIX}`;
 
 export const patterns: PatternDefinition[] = [
   // --- 絵文字 (strict) ---
@@ -68,11 +73,16 @@ export const patterns: PatternDefinition[] = [
     source: "\\u{203C}\\u{FE0F}?",
     samples: ["本当‼️"],
   },
-  { id: "emoji-bang", strict: true, source: "\\u{2757}", samples: ["早く❗"] },
+  {
+    id: "emoji-bang",
+    strict: true,
+    source: "\\u{2757}\\u{FE0F}?",
+    samples: ["早く❗"],
+  },
   {
     id: "emoji-question",
     strict: true,
-    source: "\\u{2753}",
+    source: "\\u{2753}\\u{FE0F}?",
     samples: ["は❓"],
   },
   {
@@ -138,6 +148,9 @@ export const patterns: PatternDefinition[] = [
   { id: "stem-kimo", strict: true, source: stem(KI, MO), samples: ["きもw"] },
   { id: "stem-kita", strict: true, source: stem(KI, TA), samples: ["きたーw"] },
 
+  // --- 語幹 + w/笑/爆笑/(笑) (relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
+  { id: "stem-iya", strict: false, source: stem(I, YA), samples: ["いやw"] },
+
   // --- 語幹単体 (relaxedのみ: 語尾のw/笑がなくても検知する) ---
   { id: "bare-uo", strict: false, source: bare(U, O), samples: ["うお"] },
   { id: "bare-dowa", strict: false, source: bare(DO, WA), samples: ["どわ"] },
@@ -166,9 +179,6 @@ export const patterns: PatternDefinition[] = [
   },
 
   // --- フレーズ系(strict) ---
-  // 元ネタ: https://note.com/kido_meigen/n/nc0fb2d47f6f6 / https://w.atwiki.jp/reisyou/pages/10.html
-  // 「冗談ですやん」「必死やん」は漢字を含み仮名の読み替えが素直に作れないため
-  // カタカナ/半角カナ対応は見送り、リテラルのまま。
   {
     id: "phrase-kakke",
     strict: true,
@@ -193,22 +203,18 @@ export const patterns: PatternDefinition[] = [
     source: stem(DO, "[、,]?", DO, SHI, TA),
     samples: ["ど、どした？笑"],
   },
+  // 「必死やんw」「冗談ですやんw」など、前の語を問わず「(です)やん」+ 語尾で
+  // 冷笑的な相槌として使われる構文
   {
-    id: "phrase-joudan-desu-yan",
+    id: "phrase-yan",
     strict: true,
-    source: `冗談ですやん${STEM_SUFFIX}`,
-    samples: ["冗談ですやん！！w"],
-  },
-  {
-    id: "phrase-hisshi-yan",
-    strict: true,
-    source: `必死やん${STEM_SUFFIX}`,
-    samples: ["必死やんww"],
+    source: yan(),
+    samples: ["必死ですやんw", "冗談やんw"],
   },
   {
     id: "phrase-sonna-nori",
     strict: true,
-    source: stem(SO, U, I, U, "ノリ[…\\.･]*"),
+    source: stem(SO, U, I, U, NO, RI, "[…\\.･]*"),
     samples: ["そういうノリ...w"],
   },
 
