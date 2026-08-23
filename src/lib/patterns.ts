@@ -26,6 +26,7 @@ const KO = "[こコｺ]";
 const KU = "[くクｸ]";
 const MO = "[もモﾓ]";
 const MU = "[むムﾑ]";
+const N = "[んンﾝ]";
 const NA = "[なナﾅ]";
 const NO = "[のノﾉ]";
 const O = "[おぉオォｵｫ]";
@@ -58,124 +59,204 @@ export const patterns: PatternDefinition[] = [
   {
     id: "emoji-sweat-smile",
     strict: true,
-    source: "\\u{1F605}",
-    samples: ["これは😅です"],
+    source: "\\u{1F605}", // 😅
+    samples: ["それはさすがに草😅"],
   },
   {
     id: "emoji-rofl",
     strict: true,
-    source: "\\u{1F923}",
-    samples: ["爆笑🤣爆笑"],
+    source: "\\u{1F923}", // 🤣
+    samples: ["それ何回同じネタやってんの🤣🤣"],
   },
   {
     id: "emoji-double-exclamation",
     strict: true,
-    source: "\\u{203C}\\u{FE0F}?",
-    samples: ["本当‼️"],
+    source: "\\u{203C}\\u{FE0F}?", // ‼️
+    samples: ["は？そんなことある‼️"],
   },
   {
     id: "emoji-bang",
     strict: true,
-    source: "\\u{2757}\\u{FE0F}?",
-    samples: ["早く❗"],
+    source: "\\u{2757}\\u{FE0F}?", // ❗
+    samples: ["それはさすがに無理があるだろ❗"],
   },
   {
     id: "emoji-question",
     strict: true,
-    source: "\\u{2753}\\u{FE0F}?",
-    samples: ["は❓"],
+    source: "\\u{2753}\\u{FE0F}?", // ❓
+    samples: ["は❓意味わからんのだが"],
   },
   {
     id: "emoji-interrobang",
     strict: true,
-    source: "\\u{2049}\\u{FE0F}?",
-    samples: ["は⁉️"],
+    source: "\\u{2049}\\u{FE0F}?", // ⁉️
+    samples: ["まじで言ってる⁉️"],
   },
   {
     id: "emoji-eye-roll",
     strict: true,
-    source: "\\u{1F644}",
-    samples: ["は？🙄"],
+    source: "\\u{1F644}", // 🙄
+    samples: ["はいはい、また同じ話🙄"],
   },
   {
     id: "emoji-smirk",
     strict: true,
-    source: "\\u{1F60F}",
-    samples: ["それな😏"],
+    source: "\\u{1F60F}", // 😏
+    samples: ["それな、知ってた😏"],
   },
   {
     id: "emoji-clown",
     strict: true,
-    source: "\\u{1F921}",
-    samples: ["🤡だなw"],
+    source: "\\u{1F921}", // 🤡
+    samples: ["自分だけ気づいてない🤡"],
   },
 
   // --- 絵文字 (relaxedのみ: 単体だと冷笑と断定しづらいもの) ---
   {
     id: "emoji-sweat-drop",
     strict: false,
-    source: "\\u{1F4A6}",
-    samples: ["いや💦"],
+    source: "\\u{1F4A6}", // 💦
+    samples: ["それはさすがに草だわ💦"],
   },
   {
     id: "emoji-expressionless",
     strict: false,
-    source: "\\u{1F611}",
-    samples: ["😑"],
+    source: "\\u{1F611}", // 😑
+    samples: ["……😑"],
   },
   {
     id: "emoji-upside-down",
     strict: false,
-    source: "\\u{1F643}",
-    samples: ["🙃"],
+    source: "\\u{1F643}", // 🙃
+    samples: ["はいはい、そうですね🙃"],
   },
-  { id: "emoji-skull", strict: false, source: "\\u{1F480}", samples: ["💀"] },
-  { id: "emoji-melting", strict: false, source: "\\u{1FAE0}", samples: ["🫠"] },
+  {
+    id: "emoji-skull",
+    strict: false,
+    source: "\\u{1F480}", // 💀
+    samples: ["その理論はさすがに無理💀"],
+  },
+  {
+    id: "emoji-melting",
+    strict: false,
+    source: "\\u{1FAE0}", // 🫠
+    samples: ["見てるだけでしんど🫠"],
+  },
 
   // --- 語幹 + w/笑/爆笑/(笑) (strict) ---
   {
     id: "stem-kichi",
     strict: true,
     source: stem(KI, CHI),
-    samples: ["きちーｗ"],
+    samples: ["きちーｗ急に早口になってて草"],
   },
-  { id: "stem-ou", strict: true, source: stem(O, U), samples: ["お、おうｗ"] },
-  { id: "stem-uo", strict: true, source: stem(U, O), samples: ["うおw"] },
-  { id: "stem-dowa", strict: true, source: stem(DO, WA), samples: ["どわーw"] },
-  { id: "stem-uwa", strict: true, source: stem(U, WA), samples: ["うわw"] },
-  { id: "stem-samu", strict: true, source: stem(SA, MU), samples: ["さむw"] },
-  { id: "stem-ita", strict: true, source: stem(I, TA), samples: ["いたw"] },
-  { id: "stem-kimo", strict: true, source: stem(KI, MO), samples: ["きもw"] },
-  { id: "stem-kita", strict: true, source: stem(KI, TA), samples: ["きたーw"] },
+  {
+    id: "stem-ou",
+    strict: true,
+    source: stem(O, U),
+    samples: ["お、おうｗそれは良かったな"],
+  },
+  {
+    id: "stem-uo",
+    strict: true,
+    source: stem(U, O),
+    samples: ["うおw急にキレ出してて草"],
+  },
+  {
+    id: "stem-dowa",
+    strict: true,
+    source: stem(DO, WA),
+    samples: ["どわーwww必死すぎん"],
+  },
+  {
+    id: "stem-uwa",
+    strict: true,
+    source: stem(U, WA),
+    samples: ["うわw自分で気づいてないんかな"],
+  },
+  {
+    id: "stem-samu",
+    strict: true,
+    source: stem(SA, MU),
+    samples: ["そのノリさむw誰も乗ってないよ"],
+  },
+  {
+    id: "stem-ita",
+    strict: true,
+    source: stem(I, TA),
+    samples: ["それいたw自覚ないの草"],
+  },
+  {
+    id: "stem-kimo",
+    strict: true,
+    source: stem(KI, MO),
+    samples: ["その言い方きもwドン引きだわ"],
+  },
+  {
+    id: "stem-kita",
+    strict: true,
+    source: stem(KI, TA),
+    samples: ["きたーw予想通りの反応で草"],
+  },
 
   // --- 語幹 + w/笑/爆笑/(笑) (relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
-  { id: "stem-iya", strict: false, source: stem(I, YA), samples: ["いやw"] },
+  {
+    id: "stem-iya",
+    strict: false,
+    source: stem(I, YA),
+    samples: ["いやwそれは草すぎるでしょ"],
+  },
 
   // --- 語幹単体 (relaxedのみ: 語尾のw/笑がなくても検知する) ---
-  { id: "bare-uo", strict: false, source: bare(U, O), samples: ["うお"] },
-  { id: "bare-dowa", strict: false, source: bare(DO, WA), samples: ["どわ"] },
-  { id: "bare-bakushou", strict: false, source: "爆笑", samples: ["爆笑"] },
-  { id: "bare-reishou", strict: false, source: "冷笑", samples: ["冷笑"] },
+  {
+    id: "bare-uo",
+    strict: false,
+    source: bare(U, O),
+    samples: ["うお、うお、しか言えなくなってて草"],
+  },
+  {
+    id: "bare-dowa",
+    strict: false,
+    source: bare(DO, WA),
+    samples: ["どわ…しか反応できてなくて草"],
+  },
+  {
+    id: "bare-bakushou",
+    strict: false,
+    source: "爆笑",
+    samples: ["その返し思わず爆笑してしまった"],
+  },
+  {
+    id: "bare-reishou",
+    strict: false,
+    source: "冷笑",
+    samples: ["これが世に言う冷笑ってやつか"],
+  },
 
   // --- 繰り返しパターン (strict) ---
   {
     id: "repeat-bakushou",
     strict: true,
     source: "(?:爆笑){2,}",
-    samples: ["爆笑爆笑"],
+    samples: ["その言い訳マジで爆笑爆笑"],
   },
   {
     id: "repeat-reishou",
     strict: true,
     source: "(?:冷笑){2,}",
-    samples: ["冷笑冷笑"],
+    samples: ["これぞ正統派の冷笑冷笑という感じ"],
   },
-  { id: "repeat-warai", strict: true, source: "(?:笑){2,}", samples: ["笑笑"] },
+  {
+    id: "repeat-warai",
+    strict: true,
+    source: "(?:笑){2,}",
+    samples: ["それは草生えるわ笑笑"],
+  },
   {
     id: "paren-warai",
     strict: true,
     source: "[（(]笑[）)]",
-    samples: ["(笑)", "（笑）"],
+    samples: ["はいはい、すごいですね（笑）"],
   },
 
   // --- フレーズ系(strict) ---
@@ -183,25 +264,25 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-kakke",
     strict: true,
     source: stem(KA, SMALL_TSU, KE),
-    samples: ["かっけーw"],
+    samples: ["かっけーwイキっててウケる"],
   },
   {
     id: "phrase-kakkoyo",
     strict: true,
     source: stem(KA, SMALL_TSU, KO, YO),
-    samples: ["かっこよw"],
+    samples: ["かっこよwナルシストかよ"],
   },
   {
     id: "phrase-egui",
     strict: true,
     source: stem(E, GU),
-    samples: ["えぐー！笑"],
+    samples: ["その自己評価えぐー！笑"],
   },
   {
     id: "phrase-do-doshita",
     strict: true,
-    source: stem(DO, "[、,]?", DO, SHI, TA),
-    samples: ["ど、どした？笑"],
+    source: stem(DO, "[、,]?", DO, SHI, TA, `${N}?`),
+    samples: ["ど、どした？笑 急に早口になって"],
   },
   // 「必死やんw」「冗談ですやんw」など、前の語を問わず「(です)やん」+ 語尾で
   // 冷笑的な相槌として使われる構文
@@ -209,13 +290,13 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-yan",
     strict: true,
     source: yan(),
-    samples: ["必死ですやんw", "冗談やんw"],
+    samples: ["それめっちゃ必死ですやんw", "冗談やんwノリ悪いなあ"],
   },
   {
     id: "phrase-sonna-nori",
     strict: true,
     source: stem(SO, U, I, U, NO, RI, "[…\\.･]*"),
-    samples: ["そういうノリ...w"],
+    samples: ["あぁ、そういうノリ...w理解した"],
   },
 
   // --- フレーズ系(relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
@@ -223,24 +304,24 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-cho",
     strict: false,
     source: stem(CHI, SMALL_YO),
-    samples: ["ちょw"],
+    samples: ["ちょwそれは草すぎる"],
   },
   {
     id: "phrase-mattaku",
     strict: false,
     source: stem(SMALL_TSU, TA, KU),
-    samples: ["ったくw"],
+    samples: ["ったくwしょうがないやつだな"],
   },
   {
     id: "phrase-omoroi",
     strict: false,
     source: stem(O, MO, RO, I, NA, `${A}?`),
-    samples: ["おもろいなあww"],
+    samples: ["おもろいなあwそのノリ嫌いじゃない"],
   },
   {
     id: "phrase-sugoi",
     strict: false,
     source: stem(SU, GO, I, NA, `${A}?`),
-    samples: ["すごいなあww"],
+    samples: ["すごいなあwwキミ見損なったわ"],
   },
 ];
