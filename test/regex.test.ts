@@ -47,6 +47,9 @@ const cases: Case[] = [
   { content: "どわー爆笑爆笑", expected: true },
   { content: "お、おうｗ", expected: true },
   { content: "きちーｗ", expected: true },
+  // (笑) は語幹込みで一致する(旧実装では語幹が欠落するバグがあった)
+  { content: "うお(笑)", expected: ["うお(笑)"] },
+  { content: "どわー（笑）", expected: ["どわー（笑）"] },
   // 複数マッチ
   { content: "うおうおうおｗ、爆笑爆笑", expected: ["うおｗ", "爆笑爆笑"] },
   {
@@ -61,11 +64,13 @@ describe("冷笑検出", () => {
     const isRelaxed = !!c.relaxed;
     if (typeof c.expected === "boolean") {
       test(`case ${i} [${isRelaxed ? "relaxed" : "strict"}] contains -> ${c.content}`, () => {
-        expect(contains(c.content, isRelaxed)).toBe(c.expected as boolean);
+        expect(contains(c.content, { relaxed: isRelaxed })).toBe(
+          c.expected as boolean
+        );
       });
     } else {
       test(`case ${i} [${isRelaxed ? "relaxed" : "strict"}] findAll -> ${c.content}`, () => {
-        const res = findAll(c.content, isRelaxed) || [];
+        const res = findAll(c.content, { relaxed: isRelaxed }) || [];
         expect(res).toEqual(c.expected as string[]);
       });
     }

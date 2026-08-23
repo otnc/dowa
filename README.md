@@ -32,13 +32,19 @@ const { findAll, contains } = require('dowa');
 findAll('←うおw、爆笑'); // => ['うおw', '爆笑']
 contains('うおw'); // => true
 // relaxed モード(検知範囲を拡大)
-contains('どわー', true);
+contains('どわー', { relaxed: true });
 ```
+
+> [!Important]
+> v2 で `relaxed` は第2引数の boolean からオプションオブジェクトに変わりました。
+> `findAll(text, true)` → `findAll(text, { relaxed: true })`
 
 ## API
 
-- `findAll(text: string, relaxed = false): string[] | null` — マッチした冷笑の配列を返すw（見つからなければ `null`）
-- `contains(text: string, relaxed = false): boolean` — 冷笑が含まれるかを真偽値で返すw
+- `findAll(text: string, options?: DowaOptions): string[] | null` — マッチした冷笑の配列を返すw（見つからなければ `null`）
+- `contains(text: string, options?: DowaOptions): boolean` — 冷笑が含まれるかを真偽値で返すw
+- `DowaOptions`
+  - `relaxed?: boolean` (デフォルト: `false`) — `true` で検知範囲を拡大する
 
 ## 貢献について
 
