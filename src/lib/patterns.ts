@@ -27,14 +27,17 @@ const GO = "(?:ご|ゴ|ｺﾞ)";
 const SA = "[さサｻ]";
 const SHI = "[しシｼ]";
 const SU = "[すスｽ]";
+const SE = "[せセｾ]";
 const SO = "[そソｿ]";
 const TA = "[たタﾀ]";
 const CHI = "[ちチﾁ]";
 const SMALL_TSU = "[っッｯ]";
+const TE = "[てテﾃ]";
 const DE = "(?:で|デ|ﾃﾞ)";
 const DO = "(?:ど|ド|ﾄﾞ)";
 const NA = "[なナﾅ]";
 const NO = "[のノﾉ]";
+const BO = "(?:ぼ|ボ|ﾎﾞ)";
 const MU = "[むムﾑ]";
 const MO = "[もモﾓ]";
 const YA = "[やヤﾔ]";
@@ -298,6 +301,27 @@ export const patterns: PatternDefinition[] = [
     strict: true,
     source: stem(SO, U, I, U, NO, RI, "[…\\.・･]*"),
     samples: ["あぁ、そういうノリ...w理解した"],
+  },
+  // 「うおwからのけけっwからのひひっwからのどわーwからの…ったくwからの
+  // よせやいwからのあらよっとwからのてやんでいw…」のような冷笑チェーン
+  // ネタで使われる定型フレーズ
+  {
+    id: "phrase-yoseyai",
+    strict: true,
+    source: stem(YO, SE, YA, I),
+    samples: ["よせやいw"],
+  },
+  {
+    id: "phrase-atabouyo",
+    strict: true,
+    source: stem(A, TA, BO, U, YO),
+    samples: ["あたぼうよw"],
+  },
+  {
+    id: "phrase-teyandei",
+    strict: true,
+    source: stem(TE, YA, N, DE, I),
+    samples: ["てやんでいw"],
   },
 
   // --- フレーズ系(relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
