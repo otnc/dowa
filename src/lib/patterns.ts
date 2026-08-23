@@ -8,23 +8,45 @@ export interface PatternDefinition {
   samples: string[];
 }
 
-// 語幹の異表記(ひらがな/カタカナ/半角カナ)をまとめた文字クラス
-const KI = "きキｷ";
-const CHI = "ちチﾁ";
-const O = "おぉオォｵｫ";
-const U = "うぅウゥｳｩ";
-const DO = "どドﾄﾞ";
-const WA = "わゎワヮﾜ";
-const SA = "さサｻ";
-const MU = "むムﾑ";
-const I = "いぃイィｲｨ";
-const TA = "たタﾀ";
-const MO = "もモﾓ";
+// モーラ単位の異表記(ひらがな/カタカナ/半角カナ)。そのまま連結できるように
+// 単独モーラは文字クラス `[...]`、半角に濁点合成が必要なモーラ(が/ざ/だ行など)
+// は `(?:...)` の選択構造にしている(半角カナの濁点は「ﾄ」+「ﾞ」の2文字のため
+// 文字クラスでは表現できない)。
+const A = "[あぁアァｱｧ]";
+const CHI = "[ちチﾁ]";
+const DO = "(?:ど|ド|ﾄﾞ)";
+const E = "[えぇエェｴｪ]";
+const GO = "(?:ご|ゴ|ｺﾞ)";
+const GU = "(?:ぐ|グ|ｸﾞ)";
+const I = "[いぃイィｲｨ]";
+const KA = "[かカｶ]";
+const KE = "[けケｹ]";
+const KI = "[きキｷ]";
+const KO = "[こコｺ]";
+const KU = "[くクｸ]";
+const MO = "[もモﾓ]";
+const MU = "[むムﾑ]";
+const NA = "[なナﾅ]";
+const O = "[おぉオォｵｫ]";
+const RO = "[ろロﾛ]";
+const SA = "[さサｻ]";
+const SHI = "[しシｼ]";
+const SMALL_TSU = "[っッｯ]";
+const SMALL_YO = "[ょョｮ]";
+const SO = "[そソｿ]";
+const SU = "[すスｽ]";
+const TA = "[たタﾀ]";
+const U = "[うぅウゥｳｩ]";
+const WA = "[わゎワヮﾜ]";
+const YO = "[よヨﾖ]";
 
 // 語幹の後に続く「伸ばし棒/促音の繰り返し」+「！/？」+「w/笑/爆笑/(笑)」
 const STEM_SUFFIX =
   "[-ｰー～っッｯ]*[！!？?]*(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
-const stem = (a: string, b: string) => `[${a}][${b}]${STEM_SUFFIX}`;
+// モーラ断片を連結して語幹+STEM_SUFFIXの正規表現ソースを作る
+const stem = (...parts: string[]) => parts.join("") + STEM_SUFFIX;
+// 語尾(w/笑など)を要求しない語幹単体(伸ばし棒の繰り返しのみ許容)
+const bare = (...parts: string[]) => parts.join("") + "[-ｰー～っッｯ]*";
 
 export const patterns: PatternDefinition[] = [
   // --- 絵文字 (strict) ---
@@ -114,20 +136,11 @@ export const patterns: PatternDefinition[] = [
   { id: "stem-samu", strict: true, source: stem(SA, MU), samples: ["さむw"] },
   { id: "stem-ita", strict: true, source: stem(I, TA), samples: ["いたw"] },
   { id: "stem-kimo", strict: true, source: stem(KI, MO), samples: ["きもw"] },
+  { id: "stem-kita", strict: true, source: stem(KI, TA), samples: ["きたーw"] },
 
   // --- 語幹単体 (relaxedのみ: 語尾のw/笑がなくても検知する) ---
-  {
-    id: "bare-uo",
-    strict: false,
-    source: `[${U}][${O}][-ｰー～っッｯ]*`,
-    samples: ["うお"],
-  },
-  {
-    id: "bare-dowa",
-    strict: false,
-    source: `[${DO}][${WA}][-ｰー～っッｯ]*`,
-    samples: ["どわ"],
-  },
+  { id: "bare-uo", strict: false, source: bare(U, O), samples: ["うお"] },
+  { id: "bare-dowa", strict: false, source: bare(DO, WA), samples: ["どわ"] },
   { id: "bare-bakushou", strict: false, source: "爆笑", samples: ["爆笑"] },
   { id: "bare-reishou", strict: false, source: "冷笑", samples: ["冷笑"] },
 
@@ -154,28 +167,30 @@ export const patterns: PatternDefinition[] = [
 
   // --- フレーズ系(strict) ---
   // 元ネタ: https://note.com/kido_meigen/n/nc0fb2d47f6f6 / https://w.atwiki.jp/reisyou/pages/10.html
+  // 「冗談ですやん」「必死やん」は漢字を含み仮名の読み替えが素直に作れないため
+  // カタカナ/半角カナ対応は見送り、リテラルのまま。
   {
     id: "phrase-kakke",
     strict: true,
-    source: `かっけ${STEM_SUFFIX}`,
+    source: stem(KA, SMALL_TSU, KE),
     samples: ["かっけーw"],
   },
   {
     id: "phrase-kakkoyo",
     strict: true,
-    source: `かっこよ${STEM_SUFFIX}`,
+    source: stem(KA, SMALL_TSU, KO, YO),
     samples: ["かっこよw"],
   },
   {
     id: "phrase-egui",
     strict: true,
-    source: `えぐ${STEM_SUFFIX}`,
+    source: stem(E, GU),
     samples: ["えぐー！笑"],
   },
   {
     id: "phrase-do-doshita",
     strict: true,
-    source: `ど、?どした${STEM_SUFFIX}`,
+    source: stem(DO, "[、,]?", DO, SHI, TA),
     samples: ["ど、どした？笑"],
   },
   {
@@ -193,7 +208,7 @@ export const patterns: PatternDefinition[] = [
   {
     id: "phrase-sonna-nori",
     strict: true,
-    source: `そういうノリ[…\\.･]*${STEM_SUFFIX}`,
+    source: stem(SO, U, I, U, "ノリ[…\\.･]*"),
     samples: ["そういうノリ...w"],
   },
 
@@ -201,25 +216,25 @@ export const patterns: PatternDefinition[] = [
   {
     id: "phrase-cho",
     strict: false,
-    source: `ちょ${STEM_SUFFIX}`,
+    source: stem(CHI, SMALL_YO),
     samples: ["ちょw"],
   },
   {
     id: "phrase-mattaku",
     strict: false,
-    source: `ったく${STEM_SUFFIX}`,
+    source: stem(SMALL_TSU, TA, KU),
     samples: ["ったくw"],
   },
   {
     id: "phrase-omoroi",
     strict: false,
-    source: `おもろいな[あぁ]?${STEM_SUFFIX}`,
+    source: stem(O, MO, RO, I, NA, `${A}?`),
     samples: ["おもろいなあww"],
   },
   {
     id: "phrase-sugoi",
     strict: false,
-    source: `すごいな[あぁ]?${STEM_SUFFIX}`,
+    source: stem(SU, GO, I, NA, `${A}?`),
     samples: ["すごいなあww"],
   },
 ];
