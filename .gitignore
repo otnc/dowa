@@ -1,6 +1,10 @@
 # Dependencies
 node_modules/
 
+# Build
+dist/
+coverage/
+
 # Private
 .idea/
 .private/

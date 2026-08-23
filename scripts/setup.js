@@ -142,10 +142,10 @@ async function run() {
   // README replacements
   const readmePath = path.join(cwd, "README.md");
   const readmeReplacements = [
-    [/\<your-package-name\>/gi, name],
-    [/\[\<your-package-name\>\]/gi, name],
-    [/\<your-package-description\>/gi, description],
-    [/\[\<your-package-description\>\]/gi, description],
+    [/<your-package-name>/gi, name],
+    [/\[<your-package-name>\]/gi, name],
+    [/<your-package-description>/gi, description],
+    [/\[<your-package-description>\]/gi, description],
   ];
   const readmeRes = await replaceIfExists(readmePath, readmeReplacements);
   if (readmeRes.updated)
@@ -159,12 +159,12 @@ async function run() {
   // LICENSE replacements
   const licensePath = path.join(cwd, "LICENSE");
   const licenseReplacements = [
-    [/\<year\>/gi, year],
-    [/\<YEAR\>/g, year],
-    [/\<your-name\>/gi, copyrightName],
-    [/\[\<your-name\>\]/gi, copyrightName],
-    [/\<copyright-holder\>/gi, copyrightName],
-    [/\[\<copyright-holder\>\]/gi, copyrightName],
+    [/<year>/gi, year],
+    [/<YEAR>/g, year],
+    [/<your-name>/gi, copyrightName],
+    [/\[<your-name>\]/gi, copyrightName],
+    [/<copyright-holder>/gi, copyrightName],
+    [/\[<copyright-holder>\]/gi, copyrightName],
   ];
   const licRes = await replaceIfExists(licensePath, licenseReplacements);
   if (licRes.updated)
