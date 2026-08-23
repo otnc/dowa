@@ -61,6 +61,10 @@ findMatches('うおw、爆笑爆笑');
   - `strict: boolean` — そのパターンがstrictかどうか
 - `patterns: PatternDefinition[]` — 検知に使われている全パターンの定義(id/strict/source/samples)。パターンを紹介・デバッグしたい場合に
 
+## 著者
+
+otoneko. https://github.com/otnc
+
 ## 貢献について
 
 貢献方法については [./CONTRIBUTING.md](./CONTRIBUTING.md) を確認してください
@@ -68,3 +72,13 @@ findMatches('うおw、爆笑爆笑');
 <a href="https://github.com/otnc/dowa/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=otoneko1102/dowa" />
 </a>
+
+## その他
+
+Twitter (新X) で冷笑ツイートを検知するChrome/Firefox拡張機能を公開中です。
+
+https://github.com/otnc/dowa-twitter-checker
+
+Chrome拡張機能: https://chromewebstore.google.com/detail/kkojaplhlbbildhofdophfadmbdholdn
+
+Firefox拡張機能: https://addons.mozilla.org/firefox/addon/%E5%86%B7%E7%AC%91%E3%83%81%E3%82%A7%E3%83%83%E3%82%AB%E3%83%BC-for-twitter/
