@@ -268,7 +268,7 @@ export const patterns: PatternDefinition[] = [
     id: "phrase-omoro",
     strict: true,
     source: stem(O, MO, RO, `${I}?`),
-    samples: ["おもろwww"]
+    samples: ["おもろwww"],
   },
   {
     id: "phrase-kakke",
