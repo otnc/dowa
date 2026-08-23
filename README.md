@@ -6,7 +6,7 @@
 [![Node](https://img.shields.io/node/v/dowa)](https://www.npmjs.com/package/dowa)
 [![code style: prettier](https://img.shields.io/badge/code_style-prettier-ff69b4.svg?style=flat-square)](https://github.com/prettier/prettier)
 
-> dowa means どわーw (冷笑)
+> *dowa* means どわーw (冷笑)
 
 冷笑を検知しますw
 
@@ -43,6 +43,7 @@ findMatches('うおw、爆笑爆笑');
 ```
 
 > [!Important]
+>   
 > v2 で `relaxed` は第2引数の boolean からオプションオブジェクトに変わりました。
 > `findAll(text, true)` → `findAll(text, { relaxed: true })`
 
