@@ -265,6 +265,12 @@ export const patterns: PatternDefinition[] = [
 
   // --- フレーズ系(strict) ---
   {
+    id: "phrase-omoro",
+    strict: true,
+    source: stem(O, MO, RO, `${I}?`),
+    samples: ["おもろwww"]
+  },
+  {
     id: "phrase-kakke",
     strict: true,
     source: stem(KA, SMALL_TSU, KE),
@@ -283,9 +289,9 @@ export const patterns: PatternDefinition[] = [
     samples: ["その自己評価えぐー！笑"],
   },
   {
-    id: "phrase-do-doshita",
+    id: "phrase-doshita",
     strict: true,
-    source: stem(DO, "[、,]?", DO, SHI, TA, `${N}?`),
+    source: stem(DO, SHI, TA, `${N}?`),
     samples: ["ど、どした？笑 急に早口になって"],
   },
   // 「必死やんw」「冗談ですやんw」など、前の語を問わず「(です)やん」+ 語尾で
