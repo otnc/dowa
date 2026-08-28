@@ -146,6 +146,12 @@ export const patterns: PatternDefinition[] = [
     source: "\\u{1FAE0}", // 🫠
     samples: ["見てるだけでしんど🫠"],
   },
+  {
+    id: "emoji-ok",
+    strict: false,
+    source: "\\u{1F197}", // 🆗
+    samples: ["🆗"],
+  },
 
   // --- 語幹 + w/笑/爆笑/(笑) (strict) ---
   {
