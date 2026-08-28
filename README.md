@@ -25,14 +25,15 @@ npm install dowa
 
 ```js
 // ESM
-import { findAll, contains } from 'dowa';
+import { contains, findAll, findMatches } from 'dowa';
 // CJS
-const { findAll, contains } = require('dowa');
+const { contains, findAll, findMatches } = require('dowa');
 
-findAll('←うおw、爆笑'); // => ['うおw', '爆笑']
 contains('うおw'); // => true
 // relaxed モード(検知範囲を拡大)
 contains('どわー', { relaxed: true });
+
+findAll('←うおw、爆笑'); // => ['うおw', '爆笑']
 
 // どのパターンにマッチしたかの詳細がほしい場合
 findMatches('うおw、爆笑爆笑');
