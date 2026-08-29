@@ -1,5 +1,9 @@
 import { regexStrict, regexRelaxed } from "./lib/regex";
-import { patterns, type PatternDefinition } from "./lib/patterns";
+import {
+  patterns,
+  resolveSource,
+  type PatternDefinition,
+} from "./lib/patterns";
 
 export interface DowaOptions {
   /** 検知範囲を拡大するか (デフォルト: false) */
@@ -71,7 +75,7 @@ export function findMatches(
   const results: DowaMatch[] = [];
   for (const pattern of patterns) {
     if (!pattern.strict && !relaxed) continue;
-    const re = new RegExp(pattern.source, "gu");
+    const re = new RegExp(resolveSource(pattern, relaxed), "gu");
     for (const m of text.matchAll(re)) {
       results.push({
         text: m[0],
