@@ -1,6 +1,6 @@
 {
   "name": "dowa",
-  "version": "2.0.2",
+  "version": "2.1.0",
   "description": "冷笑を検知しますw",
   "type": "module",
   "main": "dist/index.cjs",
