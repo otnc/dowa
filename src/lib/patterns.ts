@@ -37,6 +37,7 @@ const DE = "(?:で|デ|ﾃﾞ)";
 const DO = "(?:ど|ド|ﾄﾞ)";
 const NA = "[なナﾅ]";
 const NO = "[のノﾉ]";
+const BA = "(?:ば|バ|ﾊﾞ)";
 const BO = "(?:ぼ|ボ|ﾎﾞ)";
 const MU = "[むムﾑ]";
 const MO = "[もモﾓ]";
@@ -164,7 +165,7 @@ export const patterns: PatternDefinition[] = [
     id: "stem-ou",
     strict: true,
     source: stem(O, U),
-    samples: ["お、おうｗそれは良かったな"],
+    samples: ["お、おうｗ"],
   },
   {
     id: "stem-uo",
@@ -183,6 +184,12 @@ export const patterns: PatternDefinition[] = [
     strict: true,
     source: stem(U, WA),
     samples: ["うわーw"],
+  },
+  {
+    id: "stem-yaba",
+    strict: true,
+    source: stem(YA, BA),
+    samples: ["それヤバ笑"],
   },
   {
     id: "stem-samu",
