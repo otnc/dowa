@@ -2,16 +2,24 @@ export interface PatternDefinition {
   id: string;
   /** true: strict(既定)に含む / false: relaxedのときだけ含む */
   strict: boolean;
-  /** 正規表現ソース(フラグなし) */
-  source: string;
+  /** 正規表現ソース(フラグなし)。strict/relaxedで内容が変わる場合は関数 */
+  source: string | ((relaxed: boolean) => string);
   /** マッチするはずのサンプル(自動テストに使用) */
   samples: string[];
 }
 
-// モーラ単位の異表記(ひらがな/カタカナ/半角カナ)。そのまま連結できるように
-// 単独モーラは文字クラス `[...]`、半角に濁点合成が必要なモーラ(が/ざ/だ行など)
-// は `(?:...)` の選択構造にしている(半角カナの濁点は「ﾄ」+「ﾞ」の2文字のため
-// 文字クラスでは表現できない)。
+/** パターンのsourceを指定モード向けの正規表現ソース文字列に解決する */
+export function resolveSource(
+  pattern: PatternDefinition,
+  relaxed: boolean
+): string {
+  return typeof pattern.source === "function"
+    ? pattern.source(relaxed)
+    : pattern.source;
+}
+
+// モーラの異表記(ひらがな/カタカナ/半角カナ)。濁点合成が要るもの(が/ざ/だ行等)は
+// 半角カナの濁点が2文字になるため文字クラスではなく(?:...)の選択構造にしている
 const A = "[あぁアァｱｧ]";
 const I = "[いぃイィｲｨ]";
 const U = "[うぅウゥｳｩ]";
@@ -49,15 +57,34 @@ const RO = "[ろロﾛ]";
 const WA = "[わゎワヮﾜ]";
 const N = "[んンﾝ]";
 
-// 語幹の後に続く「伸ばし棒/促音の繰り返し」+「！/？」+「w/笑/爆笑/(笑)」
-const STEM_SUFFIX =
-  "[-ｰー～っッｯ]*[！!？?❗❓]*(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
-// モーラ断片を連結して語幹+STEM_SUFFIXの正規表現ソースを作る
-const stem = (...parts: string[]) => parts.join("") + STEM_SUFFIX;
+// ！/？: 語尾なしだとstrictは2文字以上、relaxedは1文字以上で許容
+const LOW_PUNCT = "[！!？?]";
+// ‼️❗❓⁉️: 語尾なしでも常に1文字から許容
+const HIGH_PUNCT = "(?:[❗❓]|‼\\u{FE0F}?|⁉\\u{FE0F}?)";
+const ANY_PUNCT = `(?:${LOW_PUNCT}|${HIGH_PUNCT})`;
+const LAUGH = "(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
+// 語幹+伸ばし棒+記号+語尾。記号だけでも上記の条件を満たせば語尾なしで許容する
+const STEM_SUFFIX = (relaxed: boolean): string =>
+  "[-ｰー～っッｯ]*(?:" +
+  `${ANY_PUNCT}*${LAUGH}` +
+  `|${LOW_PUNCT}{${relaxed ? 1 : 2},}` +
+  `|${HIGH_PUNCT}+` +
+  ")";
+// 語幹+STEM_SUFFIXを組み立てる(モードで解決する関数を返す)
+const stem =
+  (...parts: string[]) =>
+  (relaxed: boolean) =>
+    parts.join("") + STEM_SUFFIX(relaxed);
 // 語尾(w/笑など)を要求しない語幹単体(伸ばし棒の繰り返しのみ許容)
 const bare = (...parts: string[]) => parts.join("") + "[-ｰー～っッｯ]*";
 // 「(です)やん」で終わる冷笑フレーズ共通のビルダー
-const yan = (word = "") => `${word}(?:${DE}${SU})?${YA}${N}${STEM_SUFFIX}`;
+const yan =
+  (word = "") =>
+  (relaxed: boolean) =>
+    `${word}(?:${DE}${SU})?${YA}${N}${STEM_SUFFIX(relaxed)}`;
+
+// 手・指のジェスチャー系絵文字に付く肌の色modifier(任意)
+const SKIN_TONE = "[\\u{1F3FB}-\\u{1F3FF}]?";
 
 export const patterns: PatternDefinition[] = [
   // --- 絵文字 (strict) ---
@@ -115,6 +142,169 @@ export const patterns: PatternDefinition[] = [
     source: "\\u{1F921}", // 🤡
     samples: ["ふっ🤡"],
   },
+  {
+    id: "emoji-grin-fist",
+    strict: true,
+    // 😁 + (✊|👊) の組み合わせ(順不同、✊👊は肌の色modifier許容)
+    source: `(?:\\u{1F601}(?:\\u{270A}|\\u{1F44A})${SKIN_TONE}|(?:\\u{270A}|\\u{1F44A})${SKIN_TONE}\\u{1F601})`,
+    samples: ["また学校来いよ😁✊", "待ってるからな👊😁"],
+  },
+  {
+    id: "emoji-grin",
+    strict: true,
+    source: "\\u{1F601}", // 😁
+    samples: ["余裕😁"],
+  },
+  {
+    id: "emoji-fist-raised",
+    strict: true,
+    source: `\\u{270A}${SKIN_TONE}`, // ✊
+    samples: ["かかってこいよ✊"],
+  },
+  {
+    id: "emoji-fist-oncoming",
+    strict: true,
+    source: `\\u{1F44A}${SKIN_TONE}`, // 👊
+    samples: ["やる気👊"],
+  },
+  {
+    id: "emoji-point-at-viewer",
+    strict: true,
+    source: `\\u{1FAF5}${SKIN_TONE}`, // 🫵
+    samples: ["それお前のことな🫵"],
+  },
+  {
+    id: "emoji-ok-hand",
+    strict: true,
+    source: `\\u{1F44C}${SKIN_TONE}`, // 👌
+    samples: ["了解👌"],
+  },
+  {
+    id: "emoji-joy",
+    strict: true,
+    source: "\\u{1F602}", // 😂
+    samples: ["おけ😂"],
+  },
+  {
+    id: "emoji-grinning",
+    strict: true,
+    source: "\\u{1F603}", // 😃
+    samples: ["すごいですね😃"],
+  },
+  {
+    id: "emoji-tongue",
+    strict: true,
+    source: "\\u{1F61B}", // 😛
+    samples: ["残念😛"],
+  },
+  {
+    id: "emoji-wink-tongue",
+    strict: true,
+    source: "\\u{1F61C}", // 😜
+    samples: ["バレたか😜"],
+  },
+  {
+    id: "emoji-open-mouth",
+    strict: true,
+    source: "\\u{1F62E}", // 😮
+    samples: ["まさかそれ本気で言ってる😮"],
+  },
+  {
+    id: "emoji-astonished",
+    strict: true,
+    source: "\\u{1F632}", // 😲
+    samples: ["それはさすがに草😲"],
+  },
+  {
+    id: "emoji-frowning-open-mouth",
+    strict: true,
+    source: "\\u{1F626}", // 😦
+    samples: ["それは無理があるでしょ😦"],
+  },
+  {
+    id: "emoji-anguished",
+    strict: true,
+    source: "\\u{1F627}", // 😧
+    samples: ["見てて痛々しい😧"],
+  },
+  {
+    id: "emoji-fearful",
+    strict: true,
+    source: "\\u{1F628}", // 😨
+    samples: ["それはさすがにやばい😨"],
+  },
+  {
+    id: "emoji-weary",
+    strict: true,
+    source: "\\u{1F629}", // 😩
+    samples: ["もう見てられない😩"],
+  },
+  {
+    id: "emoji-zany",
+    strict: true,
+    source: "\\u{1F92A}", // 🤪
+    samples: ["それマジで言ってる🤪"],
+  },
+  {
+    id: "emoji-hot-face",
+    strict: true,
+    source: "\\u{1F975}", // 🥵
+    samples: ["必死すぎん🥵"],
+  },
+  {
+    id: "emoji-anxious-sweat",
+    strict: true,
+    source: "\\u{1F630}", // 😰
+    samples: ["それはさすがに焦るわ😰"],
+  },
+  {
+    id: "emoji-scream",
+    strict: true,
+    source: "\\u{1F631}", // 😱
+    samples: ["うそでしょ😱"],
+  },
+  {
+    id: "emoji-nerd",
+    strict: true,
+    source: "\\u{1F913}", // 🤓
+    samples: ["詳しいっすね🤓"],
+  },
+  {
+    id: "emoji-hand-over-mouth",
+    strict: true,
+    source: "\\u{1F92D}", // 🤭
+    samples: ["ぷっ🤭"],
+  },
+  {
+    id: "emoji-eyes-hand-over-mouth",
+    strict: true,
+    source: "\\u{1FAE2}", // 🫢
+    samples: ["まじで言ってるの🫢"],
+  },
+  {
+    id: "emoji-lying",
+    strict: true,
+    source: "\\u{1F925}", // 🤥
+    samples: ["よく言うわ🤥"],
+  },
+  {
+    id: "emoji-cowboy",
+    strict: true,
+    source: "\\u{1F920}", // 🤠
+    samples: ["余裕じゃん🤠"],
+  },
+  {
+    id: "emoji-point-up",
+    strict: true,
+    source: `\\u{1F446}${SKIN_TONE}`, // 👆
+    samples: ["それそれ👆"],
+  },
+  {
+    id: "emoji-point-down",
+    strict: true,
+    source: `\\u{1F447}${SKIN_TONE}`, // 👇
+    samples: ["こいつを見て👇"],
+  },
 
   // --- 絵文字 (relaxedのみ: 単体だと冷笑と断定しづらいもの) ---
   {
@@ -153,6 +343,66 @@ export const patterns: PatternDefinition[] = [
     source: "\\u{1F197}", // 🆗
     samples: ["🆗"],
   },
+  {
+    id: "emoji-pleading",
+    strict: false,
+    source: "\\u{1F97A}", // 🥺
+    samples: ["許して🥺"],
+  },
+  {
+    id: "emoji-grin-squint",
+    strict: false,
+    source: "\\u{1F606}", // 😆
+    samples: ["それは草😆"],
+  },
+  {
+    id: "emoji-thinking",
+    strict: false,
+    source: "\\u{1F914}", // 🤔
+    samples: ["それ本気で言ってる?🤔"],
+  },
+  {
+    id: "emoji-salute",
+    strict: false,
+    source: "\\u{1FAE1}", // 🫡
+    samples: ["了解しました🫡"],
+  },
+  {
+    id: "emoji-partying",
+    strict: false,
+    source: "\\u{1F973}", // 🥳
+    samples: ["やったぜ🥳"],
+  },
+  {
+    id: "emoji-squint-tongue",
+    strict: false,
+    source: "\\u{1F61D}", // 😝
+    samples: ["ばれちゃった😝"],
+  },
+  {
+    id: "emoji-monocle",
+    strict: false,
+    source: "\\u{1F9D0}", // 🧐
+    samples: ["それで?🧐"],
+  },
+  {
+    id: "emoji-shushing",
+    strict: false,
+    source: "\\u{1F92B}", // 🤫
+    samples: ["へぇ🤫"],
+  },
+  {
+    id: "emoji-shaking",
+    strict: false,
+    source: "\\u{1FAE8}", // 🫨
+    samples: ["それやば🫨"],
+  },
+  {
+    id: "emoji-holding-tears",
+    strict: false,
+    source: "\\u{1F979}", // 🥹
+    samples: ["感動した🥹"],
+  },
 
   // --- 語幹 + w/笑/爆笑/(笑) (strict) ---
   {
@@ -172,6 +422,12 @@ export const patterns: PatternDefinition[] = [
     strict: true,
     source: stem(U, O),
     samples: ["うおw"],
+  },
+  {
+    id: "stem-oke",
+    strict: true,
+    source: stem(O, KE),
+    samples: ["おけ（笑）"],
   },
   {
     id: "stem-dowa",
@@ -229,7 +485,7 @@ export const patterns: PatternDefinition[] = [
     id: "bare-uo",
     strict: false,
     source: bare(U, O),
-    samples: ["うお、うお、しか言えなくなってて草"],
+    samples: ["う、うお、しか言えなくなってて草"],
   },
   {
     id: "bare-dowa",
@@ -307,8 +563,7 @@ export const patterns: PatternDefinition[] = [
     source: stem(DO, SHI, TA, `${N}?`),
     samples: ["ど、どした？笑 急に早口になって"],
   },
-  // 「必死やんw」「冗談ですやんw」など、前の語を問わず「(です)やん」+ 語尾で
-  // 冷笑的な相槌として使われる構文
+  // 「(です)やん」+ 語尾の冷笑的な相槌
   {
     id: "phrase-yan",
     strict: true,
@@ -321,9 +576,7 @@ export const patterns: PatternDefinition[] = [
     source: stem(SO, U, I, U, NO, RI, "[…\\.・･]*"),
     samples: ["あぁ、そういうノリ...w理解した"],
   },
-  // 「うおwからのけけっwからのひひっwからのどわーwからの…ったくwからの
-  // よせやいwからのあらよっとwからのてやんでいw…」のような冷笑チェーン
-  // ネタで使われる定型フレーズ
+  // 冷笑チェーンネタで使われる定型フレーズ
   {
     id: "phrase-yoseyai",
     strict: true,
