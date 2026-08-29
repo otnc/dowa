@@ -9,8 +9,7 @@ PRに適切なラベルを付与してください
 1. このリポジトリをforkしてからローカルにクローンします
 2. `npm install` を実行
 3. 必要な修正や追加を行う
-4. `npm run check` でコードを整形&lintする (prettier + eslint)
-5. `npm run typecheck` で型チェックが通ることを確認する
+4. `npm run check` で型チェック&コードを整形&lintする (prettier + eslint)
 6. `npm run build` でビルドエラーが出ないことを確認する
 7. `npm test` で失敗しないかを確認する (必要であればテストケースを追加してから行う)
 
