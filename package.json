@@ -31,8 +31,8 @@
     "lint:fix": "eslint --fix .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "check": "npm run format && npm run lint:fix",
-    "ci": "npm run format:check && npm run lint",
+    "check": "tsc --noEmit && npm run format && npm run lint:fix",
+    "ci": "tsc --noEmit && npm run format:check && npm run lint",
     "build": "tsdown",
     "deps:check": "ncu",
     "deps:up": "ncu -u && npm install"
