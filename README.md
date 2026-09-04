@@ -50,7 +50,7 @@ findMatches('うおw、爆笑爆笑');
 
 ### Standard Schema
 
-[Standard Schema](https://standardschema.dev/) に対応したスキーマも提供しています。[zod](https://github.com/colinhacks/zod) / [valibot](https://github.com/open-circle/valibot) などのバリデーションパイプラインにそのまま組み込めるので、スキーマのパースと冷笑検知を別々に行う必要がなくなりますw
+[Standard Schema](https://standardschema.dev/) に対応したスキーマも提供しています。[zod](https://zod.dev/) / [valibot](https://valibot.dev/) などのバリデーションパイプラインにそのまま組み込めるので、スキーマのパースと冷笑検知を別々に行う必要がなくなりますw
 
 ```js
 import { dowaSchema } from 'dowa';
