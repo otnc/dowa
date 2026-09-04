@@ -18,3 +18,11 @@ function build(relaxedMode: boolean): RegExp {
 
 export const regexStrict: RegExp = build(false);
 export const regexRelaxed: RegExp = build(true);
+
+/** テキストにマッチした冷笑パターンの配列を返す(なければnull) */
+export function match(text: string, relaxed: boolean): string[] | null {
+  const re = relaxed ? regexRelaxed : regexStrict;
+  re.lastIndex = 0;
+  const m = text.match(re);
+  return m && m.length ? m : null;
+}

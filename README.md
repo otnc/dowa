@@ -48,6 +48,19 @@ findMatches('うおw、爆笑爆笑');
 > v2 で `relaxed` は第2引数の boolean からオプションオブジェクトに変わりました。
 > `findAll(text, true)` → `findAll(text, { relaxed: true })`
 
+### Standard Schema
+
+[Standard Schema](https://standardschema.dev/) に対応したスキーマも提供しています。zod・valibotなどのバリデーションパイプラインにそのまま組み込めるので、スキーマのパースと冷笑検知を別々に行う必要がなくなりますw
+
+```js
+import { dowaSchema } from 'dowa';
+
+const schema = dowaSchema({ relaxed: true }); // DowaOptionsと同じオプションを渡せる
+
+const result = await schema['~standard'].validate('うおw');
+// => { issues: [{ message: '冷笑パターンを検出しました: うおw' }] }
+```
+
 ## API
 
 - `findAll(text: string, options?: DowaOptions): string[] | null` — マッチした冷笑の配列を返すw（見つからなければ `null`）
@@ -61,6 +74,7 @@ findMatches('うおw、爆笑爆笑');
   - `patternId: string` — マッチしたパターンのid([src/lib/patterns.ts](./src/lib/patterns.ts) 参照)
   - `strict: boolean` — そのパターンがstrictかどうか
 - `patterns: PatternDefinition[]` — 検知に使われている全パターンの定義(id/strict/source/samples)。パターンを紹介・デバッグしたい場合に
+- `dowaSchema(options?: DowaOptions): StandardSchemaV1<string, string>` — 冷笑を検知する[Standard Schema](https://standardschema.dev/)を作る。冷笑が検出された場合は`issues`で弾く
 
 ## 貢献について
 

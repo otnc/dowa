@@ -1,14 +1,11 @@
-import { regexStrict, regexRelaxed } from "./lib/regex";
+import { regexStrict, regexRelaxed, match } from "./lib/regex";
 import {
   patterns,
   resolveSource,
   type PatternDefinition,
 } from "./lib/patterns";
-
-export interface DowaOptions {
-  /** 検知範囲を拡大するか (デフォルト: false) */
-  relaxed?: boolean;
-}
+import { resolveRelaxed, type DowaOptions } from "./lib/options";
+import { dowaSchema } from "./lib/schema";
 
 export interface DowaMatch {
   /** マッチした文字列 */
@@ -25,14 +22,7 @@ function validate(text: string, options: DowaOptions): boolean {
   if (typeof text !== "string") {
     throw new TypeError('"text" must be a string.');
   }
-  if (typeof options !== "object" || options === null) {
-    throw new TypeError('"options" must be an object.');
-  }
-  const { relaxed = false } = options;
-  if (typeof relaxed !== "boolean") {
-    throw new TypeError('"options.relaxed" must be a boolean.');
-  }
-  return relaxed;
+  return resolveRelaxed(options);
 }
 
 /**
@@ -45,10 +35,7 @@ export function findAll(
   options: DowaOptions = {}
 ): string[] | null {
   const relaxed = validate(text, options);
-  const re = relaxed ? regexRelaxed : regexStrict;
-  re.lastIndex = 0;
-  const m = text.match(re);
-  return m && m.length ? m : null;
+  return match(text, relaxed);
 }
 
 /**
@@ -89,5 +76,5 @@ export function findMatches(
   return results.length ? results : null;
 }
 
-export { regexStrict, regexRelaxed, patterns };
-export type { PatternDefinition };
+export { regexStrict, regexRelaxed, patterns, dowaSchema };
+export type { PatternDefinition, DowaOptions };
