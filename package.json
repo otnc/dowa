@@ -46,7 +46,8 @@
     "jp",
     "japanese",
     "regex",
-    "regexp"
+    "regexp",
+    "standard-schema"
   ],
   "author": "otoneko.",
   "license": "MIT",
@@ -54,6 +55,9 @@
     "url": "https://github.com/otnc/dowa/issues"
   },
   "homepage": "https://github.com/otnc/dowa#readme",
+  "dependencies": {
+    "@standard-schema/spec": "^1.1.0"
+  },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "@vitest/coverage-v8": "^4.1.11",
@@ -65,6 +69,8 @@
     "tsdown": "^0.22.14",
     "typescript": "^5.9.3",
     "typescript-eslint": "^8.67.0",
-    "vitest": "^4.1.11"
+    "valibot": "^1.4.2",
+    "vitest": "^4.1.11",
+    "zod": "^4.5.4"
   }
 }
