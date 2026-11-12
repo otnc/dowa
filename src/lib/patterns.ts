@@ -1,21 +1,23 @@
-export interface PatternDefinition {
-  id: string;
+/** 検知パターン1件(公開用。読み取り専用) */
+export interface Pattern {
+  readonly id: string;
   /** true: strict(既定)に含む / false: relaxedのときだけ含む */
+  readonly strict: boolean;
+  /** モードごとの正規表現ソース(フラグなし。`gu` フラグで使う前提) */
+  readonly source: { readonly strict: string; readonly relaxed: string };
+  /** マッチするはずのサンプル(自動テストに使用) */
+  readonly samples: readonly string[];
+  /** このパターンにはマッチしてはいけないサンプル(自動テストに使用) */
+  readonly negativeSamples: readonly string[];
+}
+
+interface PatternDefinition {
+  id: string;
   strict: boolean;
   /** 正規表現ソース(フラグなし)。strict/relaxedで内容が変わる場合は関数 */
   source: string | ((relaxed: boolean) => string);
-  /** マッチするはずのサンプル(自動テストに使用) */
   samples: string[];
-}
-
-/** パターンのsourceを指定モード向けの正規表現ソース文字列に解決する */
-export function resolveSource(
-  pattern: PatternDefinition,
-  relaxed: boolean
-): string {
-  return typeof pattern.source === "function"
-    ? pattern.source(relaxed)
-    : pattern.source;
+  negativeSamples?: string[];
 }
 
 // モーラの異表記(ひらがな/カタカナ/半角カナ)。濁点合成が要るもの(が/ざ/だ行等)は
@@ -62,10 +64,14 @@ const LOW_PUNCT = "[！!？?]";
 // ‼️❗❓⁉️: 語尾なしでも常に1文字から許容
 const HIGH_PUNCT = "(?:[❗❓]|‼\\u{FE0F}?|⁉\\u{FE0F}?)";
 const ANY_PUNCT = `(?:${LOW_PUNCT}|${HIGH_PUNCT})`;
-const LAUGH = "(?:[wｗ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
+const LAUGH = "(?:[wｗWＷ]+|(?:(?:爆笑)|笑)+|[（(]笑[）)])";
+// 伸ばし棒・促音の繰り返し。～(U+FF5E)はWindows、〜(U+301C)はmacOSのIMEで入力される
+const STRETCH = "[-ｰー～〜っッｯ]*";
+// 語幹と語尾の間に挟まる三点リーダー・中黒(例: ヤバ…w)
+const ELLIPSIS = "[…‥・･]*";
 // 語幹+伸ばし棒+記号+語尾。記号だけでも上記の条件を満たせば語尾なしで許容する
 const STEM_SUFFIX = (relaxed: boolean): string =>
-  "[-ｰー～っッｯ]*(?:" +
+  `${STRETCH}${ELLIPSIS}(?:` +
   `${ANY_PUNCT}*${LAUGH}` +
   `|${LOW_PUNCT}{${relaxed ? 1 : 2},}` +
   `|${HIGH_PUNCT}+` +
@@ -76,7 +82,10 @@ const stem =
   (relaxed: boolean) =>
     parts.join("") + STEM_SUFFIX(relaxed);
 // 語尾(w/笑など)を要求しない語幹単体(伸ばし棒の繰り返しのみ許容)
-const bare = (...parts: string[]) => parts.join("") + "[-ｰー～っッｯ]*";
+const bare = (...parts: string[]) => parts.join("") + STRETCH;
+// 直前が指定の文字ならマッチさせない。動詞の活用(行ってきた/寝ていた)などの誤検知を防ぐ
+const notAfter = (chars: string) => `(?<![${chars}])`;
+const KANJI = "\\p{Script=Han}々";
 // 「(です)やん」で終わる冷笑フレーズ共通のビルダー
 const yan =
   (word = "") =>
@@ -86,7 +95,7 @@ const yan =
 // 手・指のジェスチャー系絵文字に付く肌の色modifier(任意)
 const SKIN_TONE = "[\\u{1F3FB}-\\u{1F3FF}]?";
 
-export const patterns: PatternDefinition[] = [
+const definitions: PatternDefinition[] = [
   // --- 絵文字 (strict) ---
   {
     id: "emoji-sweat-smile",
@@ -426,8 +435,10 @@ export const patterns: PatternDefinition[] = [
   {
     id: "stem-oke",
     strict: true,
-    source: stem(O, KE),
+    // 「しておけw」のような命令形を除く
+    source: stem(notAfter("てで"), O, KE),
     samples: ["おけ（笑）"],
+    negativeSamples: ["そこに置いておけw"],
   },
   {
     id: "stem-dowa",
@@ -438,8 +449,10 @@ export const patterns: PatternDefinition[] = [
   {
     id: "stem-uwa",
     strict: true,
-    source: stem(U, WA),
-    samples: ["うわーw"],
+    // 「思うわw」のような動詞+終助詞を除く
+    source: stem(notAfter(KANJI), U, WA),
+    samples: ["うわーw", "マジでうわw"],
+    negativeSamples: ["それは違うと思うわw"],
   },
   {
     id: "stem-yaba",
@@ -456,8 +469,10 @@ export const patterns: PatternDefinition[] = [
   {
     id: "stem-ita",
     strict: true,
-    source: stem(`${A}?`, I, `${TA}+`),
+    // 「寝ていたw」「書いたw」のような過去形を除く
+    source: stem(notAfter(`${KANJI}てで`), `${A}?`, I, `${TA}+`),
     samples: ["アイタタタタw"],
+    negativeSamples: ["ずっと寝ていたw", "手紙を書いたw"],
   },
   {
     id: "stem-kimo",
@@ -468,8 +483,10 @@ export const patterns: PatternDefinition[] = [
   {
     id: "stem-kita",
     strict: true,
-    source: stem(KI, TA),
+    // 「行ってきたw」「起きた?!」のような過去形を除く
+    source: stem(notAfter(`${KANJI}てで`), KI, TA),
     samples: ["キター！！！！ｗ"],
+    negativeSamples: ["昨日行ってきたw", "できた！！", "起きた?!"],
   },
 
   // --- 語幹 + w/笑/爆笑/(笑) (relaxedのみ: 単体では冷笑以外の文脈でも頻出するため) ---
@@ -622,3 +639,28 @@ export const patterns: PatternDefinition[] = [
     samples: ["すごいなあwwキミ見損なったわ"],
   },
 ];
+
+function resolve(def: PatternDefinition): Pattern {
+  const sourceFor = (relaxed: boolean): string =>
+    typeof def.source === "function" ? def.source(relaxed) : def.source;
+  return Object.freeze({
+    id: def.id,
+    strict: def.strict,
+    source: Object.freeze({
+      strict: sourceFor(false),
+      relaxed: sourceFor(true),
+    }),
+    samples: Object.freeze([...def.samples]),
+    negativeSamples: Object.freeze([...(def.negativeSamples ?? [])]),
+  });
+}
+
+/** 検知に使われている全パターン(定義順) */
+export const patterns: readonly Pattern[] = Object.freeze(
+  definitions.map(resolve)
+);
+
+/** パターンidの集合(オプションの検証用) */
+export const patternIds: ReadonlySet<string> = new Set(
+  patterns.map((p) => p.id)
+);
