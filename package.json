@@ -16,11 +16,14 @@
     }
   },
   "types": "dist/index.d.mts",
+  "bin": {
+    "dowa": "dist/cli.mjs"
+  },
   "files": [
     "dist"
   ],
   "engines": {
-    "node": ">=14"
+    "node": ">=18.3.0"
   },
   "scripts": {
     "test": "vitest run",
@@ -47,7 +50,8 @@
     "japanese",
     "regex",
     "regexp",
-    "standard-schema"
+    "standard-schema",
+    "cli"
   ],
   "author": "otoneko.",
   "license": "MIT",
@@ -60,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@types/node": "^20.19.43",
     "@vitest/coverage-v8": "^4.1.11",
     "eslint": "^10.9.0",
     "eslint-config-prettier": "^10.1.8",

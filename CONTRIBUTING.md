@@ -10,14 +10,17 @@ PRに適切なラベルを付与してください
 2. `npm install` を実行
 3. 必要な修正や追加を行う
 4. `npm run check` で型チェック&コードを整形&lintする (prettier + eslint)
-6. `npm run build` でビルドエラーが出ないことを確認する
-7. `npm test` で失敗しないかを確認する (必要であればテストケースを追加してから行う)
+5. `npm run build` でビルドエラーが出ないことを確認する
+6. `npm test` で失敗しないかを確認する (必要であればテストケースを追加してから行う)
+7. CLI を変更した場合は `node dist/cli.mjs` で実際に動かして確認する
 
 ## 説明
 
 - 冷笑のパターンを追加する場合
-  - [./src/lib/patterns.ts](./src/lib/patterns.ts) の `patterns` 配列に `PatternDefinition` を1つ追加してください(`id` / `strict` / `source` / `samples`)
+  - [./src/lib/patterns.ts](./src/lib/patterns.ts) の `definitions` 配列に `PatternDefinition` を1つ追加してください(`id` / `strict` / `source` / `samples` / 任意で `negativeSamples`)
     - `samples` に書いたサンプル文字列は自動でテスト化されます([test/index.test.ts](./test/index.test.ts))。個別にテストコードを書く必要はありません
+    - 誤検知しやすい文(「行ってきたw」のような動詞の活用など)は `negativeSamples` に書いてください。そのパターンにマッチしないことが自動でテストされます
+    - 直前の文字によって誤検知する場合は `notAfter()` で除外できます
   - 可能であれば **ひらがな** , **カタカナ** , **半角カナ** , **小文字** も同様に含めてください
   - 追加するパターンが明らかに冷笑な場合は `strict: true` に、冷笑か怪しい場合や文脈によっては冷笑ではないパターンは `strict: false` (relaxedモードでのみ検知)にしてください
 
@@ -27,7 +30,7 @@ PRに適切なラベルを付与してください
 
 > [!Important]
 >   
-> ESM/CJS/ブラウザ(Web)のうち、どの環境でも同じ実装で動作するコードが望ましいです
+> ESM/CJS/ブラウザ(Web)のうち、どの環境でも同じ実装で動作するコードが望ましいです。Node.js の API (`node:*`) を使ってよいのは CLI ([./src/cli/](./src/cli/)) だけです
 
 ## 禁止事項
 

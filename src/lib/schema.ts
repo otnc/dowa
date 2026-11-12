@@ -1,6 +1,6 @@
 import type { StandardSchemaV1 } from "@standard-schema/spec";
-import { resolveRelaxed, type DowaOptions } from "./options";
-import { match } from "./regex";
+import { resolveOptions, type DowaOptions } from "./options";
+import { getMatcher } from "./regex";
 
 /**
  * 冷笑を検知するStandardSchema( https://standardschema.dev/ )を作る。
@@ -9,7 +9,7 @@ import { match } from "./regex";
 export function dowaSchema(
   options: DowaOptions = {}
 ): StandardSchemaV1<string, string> {
-  const relaxed = resolveRelaxed(options);
+  const { combined } = getMatcher(resolveOptions(options));
   return {
     "~standard": {
       version: 1,
@@ -18,7 +18,7 @@ export function dowaSchema(
         if (typeof value !== "string") {
           return { issues: [{ message: '"value" must be a string.' }] };
         }
-        const matches = match(value, relaxed);
+        const matches = value.match(combined);
         return matches
           ? {
               issues: matches.map((text) => ({

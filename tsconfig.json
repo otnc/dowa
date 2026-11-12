@@ -9,7 +9,9 @@
     "skipLibCheck": true,
     "forceConsistentCasingInFileNames": true,
     "isolatedModules": true,
-    "noEmit": true
+    "noEmit": true,
+    "resolveJsonModule": true,
+    "types": ["node"]
   },
   "include": ["src", "test", "tsdown.config.ts", "vitest.config.ts"]
 }
