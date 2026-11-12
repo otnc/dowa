@@ -24,3 +24,19 @@ jobs:
       - run: npm run ci
       - run: npm run test
       - run: npm run build
+
+      # vitest needs a newer Node.js, so only the built package is checked on
+      # the minimum version declared in package.json "engines".
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18.3.0
+
+      - name: Smoke test on the minimum supported Node.js
+        run: |
+          node -e "if (!require('./dist/index.cjs').contains('うおw')) process.exit(1)"
+          node --input-type=module -e "import { contains } from './dist/index.mjs'; if (!contains('うおw')) process.exit(1)"
+          set +e
+          echo 'うおw' | node dist/cli.mjs --json
+          code=$?
+          set -e
+          test "$code" -eq 1
